@@ -1,11 +1,12 @@
 <script setup lang="ts">
 const api_key = '292c4b0236f7780534f32df7ea0820a3';
-const search = ref("");
+const cookie = useCookie("city");
+const search = ref(cookie.value);
 const input = ref("");
-if(! search.value){
-            search.value = 'london'
+if(! cookie.value){
+    cookie.value = 'london'
         }
-const { data: city, error, refresh } = useAsyncData("city", async () => {
+const { data: city, error } = useAsyncData("city", async () => {
     let response;
     try{
         
@@ -14,6 +15,7 @@ const { data: city, error, refresh } = useAsyncData("city", async () => {
 return response
     }catch(error){
         console.log(error);
+        search.value = cookie.value
     }
     return response;
 },{
@@ -22,24 +24,26 @@ return response
     ]});
 const hendleSearch = () =>{
     search.value = input.value.trim().split(" ").join("+");
+    cookie.value = search.value;
     input.value = "";
     console.log('clickes')
 }
 </script>
 <template>
-  <body class="bg-success">
+  
+  <body class="bg-accent">
     <div class="  hero min-h-screen">
       <div class="hero-content text-center ">
           <div class="max-w-md ">
-              <h1 class="text-5xl font-bold">{{city.name}} {{(city.main.temp)}}</h1>
+              <h1 class="text-5xl font-bold">{{city.name}} {{city.main.temp}}°</h1>
               <div class="flex justify-center">
 
               </div>
               <div class="flex justify-center">
                   <div class="form-control ">
                       <div class="input-group pt-3">
-                          <input type="text" placeholder="Search…" class="input input-bordered" v-model ="input" />
-                          <button class="btn btn-square " @click="hendleSearch" >
+                          <input type="text" placeholder="Search…" class="input input-bordered"  v-model="input"/>
+                          <button class="btn btn-square " @click="hendleSearch">
                               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                                   stroke="currentColor">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -54,9 +58,12 @@ const hendleSearch = () =>{
       </div>
   </div>
   </body>
+ 
 </template>
+
 <style scoped>
-body {
+body{
   height: 100vh;
 }
+
 </style>
