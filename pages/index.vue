@@ -1,21 +1,45 @@
 <script setup lang="ts">
-  const api_key = '292c4b0236f7780534f32df7ea0820a3';
-  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=london&appid=292c4b0236f7780534f32df7ea0820a3`
+const api_key = '292c4b0236f7780534f32df7ea0820a3';
+const search = ref("");
+const input = ref("");
+if(! search.value){
+            search.value = 'london'
+        }
+const { data: city, error, refresh } = useAsyncData("city", async () => {
+    let response;
+    try{
+        
+        response = await $fetch(`https://api.openweathermap.org/data/2.5/weather?q=${search.value}&units=metric&appid=${api_key}`
+)
+return response
+    }catch(error){
+        console.log(error);
+    }
+    return response;
+},{
+    watch:[
+        search
+    ]});
+const hendleSearch = () =>{
+    search.value = input.value.trim().split(" ").join("+");
+    input.value = "";
+    console.log('clickes')
+}
 </script>
 <template>
   <body class="bg-success">
     <div class="  hero min-h-screen">
       <div class="hero-content text-center ">
           <div class="max-w-md ">
-              <h1 class="text-5xl font-bold">London 31.12°</h1>
+              <h1 class="text-5xl font-bold">{{city.name}} {{(city.main.temp)}}</h1>
               <div class="flex justify-center">
 
               </div>
               <div class="flex justify-center">
                   <div class="form-control ">
                       <div class="input-group pt-3">
-                          <input type="text" placeholder="Search…" class="input input-bordered"  />
-                          <button class="btn btn-square " >
+                          <input type="text" placeholder="Search…" class="input input-bordered" v-model ="input" />
+                          <button class="btn btn-square " @click="hendleSearch" >
                               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                                   stroke="currentColor">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
